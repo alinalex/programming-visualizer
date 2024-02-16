@@ -1,76 +1,60 @@
 'use client'
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { bubbleSortArrayLength, bubbleSortWaitMs, spring } from "../constants/bubbleSortConstants";
 import generateRandomUniqueArray from "../utils/generateRandomUniqueArray";
-import { bubbleSortArrayLength, bubbleSortWaitMs } from "../constants/bubbleSortConstants";
+import timer from "../utils/timer";
 
 export default function BubbleSort({ initialArray }: { initialArray: number[] }) {
-  const spring = {
-    type: "spring",
-    damping: 25,
-    stiffness: 120,
-  };
-
-  const [exampleArray, setExampleArray] = useState(initialArray);
-  const [sortingInProgress, setSortingInProgress] = useState(false);
   const [resetInProgress, setResetInProgress] = useState(false);
-  const [isCompared, setIsCompared] = useState<number[]>([]);
-  const [sortedIndexes, setSortedIndexes] = useState<number[]>([]);
-  let staticArray = initialArray;
-  const pause = useRef(false);
-  const indexI = useRef(1);
-  const indexJ = useRef(0);
-
-
-  function timer(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
-
-  async function reorder() {
-    setSortingInProgress(true);
-    let len = staticArray.length;
-    let i: number;
-    let j: number;
-    loop1: for (i = indexI.current; i < len; i++) {
-      for (j = indexJ.current; j < len - i; j++) {
-        setIsCompared([j, j + 1]);
-        await timer(bubbleSortWaitMs);
-        if (staticArray[j] > staticArray[j + 1]) {
-          let toBeUpped = staticArray[j];
-          let toBeDown = staticArray[j + 1];
-          const updatedArray = [...staticArray.slice(0, j), toBeDown, toBeUpped, ...staticArray.slice(j + 2)];
-          staticArray = updatedArray;
-          setExampleArray(updatedArray)
-          await timer(bubbleSortWaitMs);
-        }
-        if (pause.current) {
-          indexI.current = i;
-          indexJ.current = j;
-          break loop1;
-        }
-      }
-      setIsCompared([]);
-      setSortedIndexes(prevState => [...prevState, staticArray.length - i]);
-      await timer(bubbleSortWaitMs);
-    }
-    if (!pause.current) {
-      setSortedIndexes(prevState => [...prevState, staticArray.length - i]);
-      setSortingInProgress(false);
-    }
-  }
+  const [exampleArray, setExampleArray] = useState<number[]>(initialArray);
+  const unsortedArray = [{ entries: initialArray }];
+  const currentIndex = useRef(0);
+  let sortInterval: string | number | NodeJS.Timeout | undefined;
 
   async function resetArray() {
     setResetInProgress(true);
     const updatedArray = generateRandomUniqueArray({ length: bubbleSortArrayLength });
-    staticArray = updatedArray;
     setExampleArray(updatedArray);
     await timer(bubbleSortWaitMs);
     setResetInProgress(false);
   }
 
-  function playPause() {
-    pause.current = !pause.current;
-    if (!pause.current) reorder();
+  async function bubbleSort({ arr }: { arr: number[] }) {
+    let swapped;
+
+    do {
+      swapped = false;
+      for (let i = 0; i < arr.length - 1; i++) {
+        if (arr[i] > arr[i + 1]) {
+          let temp = arr[i];
+          arr[i] = arr[i + 1];
+          arr[i + 1] = temp;
+          swapped = true;
+          unsortedArray.push({ entries: [...arr] });
+          // setExampleArray([...exampleArray, { entries: arr }]);
+          // await timer(50);
+        }
+      }
+    } while (swapped);
+
+    // return arr;
+  }
+
+  async function reorder() {
+    bubbleSort({ arr: [...unsortedArray[0].entries] });
+    // setExampleArray(unsortedArray[currentIndex.current].entries)
+    clearInterval(sortInterval);
+    sortInterval = setInterval(function () {
+      if (currentIndex.current < (unsortedArray.length - 1)) {
+        // setCurrentIndex(prevState => prevState + 1);
+        currentIndex.current += 1;
+        console.log('currentIndex', currentIndex);
+        setExampleArray(unsortedArray[currentIndex.current].entries)
+      } else {
+        clearInterval(sortInterval);
+      }
+    }, bubbleSortWaitMs);
   }
 
   return (
@@ -89,7 +73,8 @@ export default function BubbleSort({ initialArray }: { initialArray: number[] })
                     layout
                     key={item}
                     transition={spring}
-                    className={`text-xl max-w-fit ${sortedIndexes.includes(index) && 'text-orange-700'} ${isCompared.includes(index) && 'text-green-700'}`}
+                    className={`text-xl max-w-fit`}
+                  // ${sortedIndexes.includes(index) && 'text-orange-700'} ${isCompared.includes(index) && 'text-green-700'}
                   >{item}</motion.div>
                   {index !== exampleArray.length - 1 && <div className="text-xl mr-1">,</div>}
                 </div>
@@ -100,11 +85,11 @@ export default function BubbleSort({ initialArray }: { initialArray: number[] })
       }
       <div className="flex gap-x-4">
         <div
-          className={`mt-4 rounded-lg w-fit py-2 px-5 text-white ${sortingInProgress ? 'pointer-events-none bg-gray-500' : 'bg-sky-400 cursor-pointer'}`}
+          className={`mt-4 rounded-lg w-fit py-2 px-5 text-white bg-sky-400 cursor-pointer`}
+          // ${sortingInProgress ? 'pointer-events-none bg-gray-500' : 'bg-sky-400 cursor-pointer'}
           onClick={e => reorder()}
         >bubble sort</div>
         <div className={`mt-4 cursor-pointer rounded-lg bg-amber-400 w-fit py-2 px-5 text-white`} onClick={(e) => resetArray()}>reset array</div>
-        <div className={`mt-4 cursor-pointer rounded-lg bg-green-400 w-fit py-2 px-5 text-white`} onClick={(e) => playPause()}>{pause.current ? 'play' : 'pause'}</div>
       </div>
     </section>
   )
