@@ -7,7 +7,7 @@ export default function Home() {
   const initialArray = generateRandomUniqueArray({ length: bubbleSortArrayLength });
 
   return (
-    <main className="min-h-screen p-24">
+    <main className="min-h-screen p-12">
       <BubbleSort initialArray={initialArray} />
     </main>
   );
