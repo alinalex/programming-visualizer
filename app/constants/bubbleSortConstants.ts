@@ -1,6 +1,6 @@
 export const bubbleSortArrayLength = 5;
 export const bubbleSortTopValue = 200;
-export const bubbleSortWaitMs = 500;
+export const bubbleSortWaitMs = 1000;
 export const spring = {
   type: "spring",
   damping: 25,
@@ -80,3 +80,18 @@ export const bubbleSortCodeArray = [
 export const unsortedStateColor = 'text-sky-600';
 export const comparingStateColor = 'text-green-600';
 export const sortedStateColor = 'text-orange-600';
+
+export const explanationsList = {
+  start: 'We start the sorting.',
+  initSwap: 'Initialize a variable that tells us if any swap was made during a for iteration.',
+  initLen: 'Initialize a variable for the index of last unsorted element, where we will stop with the for iteration.',
+  do: 'We will make comparisons while swapped variable is true.',
+  swapToFalse: 'Set the swapped variable to false.',
+  iteration: (len: number, i: number) => `Iterate from index 0 up to ${len}. The current index is ${i}.`,
+  comparison: (i: number, j: number) => `Checking if ${i} is greater than ${j} and swap them if that is true.`,
+  doSwap: 'We do the swap.',
+  swapToTrue: 'Set the value of swapped variable to true since we made the swap.',
+  decrementLen: 'We decrement the index of last unsorted element.',
+  noSwap: 'No swap is done in this pass. We can terminate Bubble Sort now.',
+  sortIsDone: 'The array is sorted.',
+}

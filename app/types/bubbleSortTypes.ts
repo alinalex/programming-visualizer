@@ -3,7 +3,8 @@ export type sortDataType = {
     value: number;
     color: string;
   }[];
-  lineNo: number[]
+  lineNo: number[];
+  explanation: string;
 }[];
 
 export type sortingStatusType = 'not-started' | 'in-progress' | 'paused';
