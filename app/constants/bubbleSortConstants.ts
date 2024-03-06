@@ -77,9 +77,9 @@ export const bubbleSortCodeArray = [
   `}`,
 ];
 
-export const unsortedStateColor = 'text-sky-600';
-export const comparingStateColor = 'text-green-600';
-export const sortedStateColor = 'text-orange-600';
+export const unsortedStateColor = 'text-[#61aeee]'; //'text-sky-600';
+export const comparingStateColor = 'text-[#98c379]'; //'text-green-600';
+export const sortedStateColor = 'text-[#d19a66]'; //'text-orange-600';
 
 export const explanationsList = {
   start: 'We start the sorting.',
